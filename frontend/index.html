@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISL Decode — Indian Sign Language Recognition</title>
+  <link rel="stylesheet" href="src/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-ring">
+          <svg viewBox="0 0 40 40" width="40" height="40">
+            <circle cx="20" cy="20" r="17" fill="none" stroke="var(--saffron)"
+                    stroke-width="1.5" stroke-dasharray="8 4"/>
+            <text x="20" y="27" text-anchor="middle" font-size="17">🤟</text>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">ISL Decode</span>
+          <span class="logo-tagline">Indian Sign Language · AI</span>
+        </div>
+      </div>
+
+      <nav class="main-nav" role="navigation" aria-label="Main navigation">
+        <button class="nav-link active" data-tab="recognize">◉ Recognize</button>
+        <button class="nav-link" data-tab="learn">◎ Learn Signs</button>
+        <button class="nav-link" data-tab="about">◌ About ISL</button>
+      </nav>
+
+      <div class="status-chip" id="statusChip">
+        <span class="status-dot offline"></span>
+        <span class="status-text">Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="app-main">
+
+    <!-- ══ TAB: RECOGNIZE ══ -->
+    <section class="tab-panel active" id="tab-recognize">
+      <div class="hero-band">
+        <h1 class="hero-h1">Speak with your hands.<br><em>We read every gesture.</em></h1>
+        <p class="hero-p">Point your camera at an ISL sign — recognition runs live, entirely in your browser.</p>
+      </div>
+
+      <div class="recognizer-layout">
+
+        <!-- LEFT: Camera -->
+        <div class="cam-column">
+          <div class="cam-frame" id="camFrame">
+            <video id="videoEl" autoplay muted playsinline></video>
+            <canvas id="overlayCanvas"></canvas>
+
+            <div class="cam-idle" id="camIdle">
+              <div class="idle-icon">📷</div>
+              <p>Press <strong>Start Camera</strong> below</p>
+              <p class="idle-sub">Nothing is uploaded — runs 100% in your browser</p>
+            </div>
+
+            <div class="scan-bar" id="scanBar"></div>
+
+            <div class="cam-controls">
+              <button class="cam-btn" id="btnFlip"       title="Flip camera">⇄</button>
+              <button class="cam-btn" id="btnFullscreen" title="Fullscreen">⛶</button>
+            </div>
+
+            <div class="conf-strip" id="confStrip" hidden>
+              <span class="conf-label">Confidence</span>
+              <div class="conf-bar"><div class="conf-fill" id="confFill"></div></div>
+              <span class="conf-pct" id="confPct">0%</span>
+            </div>
+          </div>
+
+          <button class="btn-cam" id="btnCamera">
+            <span id="btnCamIcon">▶</span> <span id="btnCamLabel">Start Camera</span>
+          </button>
+
+          <div class="mode-row">
+            <span class="mode-eyebrow">Mode</span>
+            <div class="mode-group">
+              <button class="mode-btn active" data-mode="alphabet">Alphabet</button>
+              <button class="mode-btn"        data-mode="number">Number</button>
+              <button class="mode-btn"        data-mode="word">Word</button>
+            </div>
+          </div>
+
+          <div class="tips-strip">
+            💡 <span id="tipText">Hold your hand 30–60 cm from the camera</span>
+          </div>
+        </div>
+
+        <!-- RIGHT: Output -->
+        <div class="output-column">
+
+          <!-- Big Sign Card -->
+          <div class="sign-card">
+            <div class="sign-card-header">
+              <span class="card-eyebrow">Detected Sign</span>
+              <div class="live-pill" id="livePill">● IDLE</div>
+            </div>
+            <div class="sign-card-body">
+              <div class="sign-glyph"      id="signGlyph">—</div>
+              <div class="sign-english"    id="signEnglish">Show an ISL sign</div>
+              <div class="sign-devanagari" id="signDevanagari"></div>
+            </div>
+            <div class="sign-card-footer">
+              <button class="action-btn"           id="btnAddWord">＋ Add to sentence</button>
+              <button class="action-btn secondary"  id="btnSpeakSign">🔊 Speak</button>
+            </div>
+          </div>
+
+          <!-- Sentence Builder -->
+          <div class="sentence-card">
+            <div class="sentence-header">
+              <span class="card-eyebrow">Sentence Builder</span>
+              <div class="sentence-actions">
+                <button class="icon-btn"      id="btnSpeakSentence" title="Speak sentence">🔊</button>
+                <button class="icon-btn"      id="btnCopySentence"  title="Copy text">⎘</button>
+                <button class="icon-btn red"  id="btnClearSentence" title="Clear">✕</button>
+              </div>
+            </div>
+            <div class="sentence-body" id="sentenceBody">
+              <span class="sentence-empty">Add signs to build a sentence…</span>
+            </div>
+            <div class="sentence-footer">
+              <span class="word-count" id="wordCount">0 words</span>
+            </div>
+          </div>
+
+          <!-- History -->
+          <div class="history-card">
+            <div class="history-header">
+              <span class="card-eyebrow">Recent Detections</span>
+              <button class="icon-btn sm" id="btnClearHistory">Clear</button>
+            </div>
+            <div class="history-chips" id="historyChips">
+              <span class="chips-empty">Nothing yet</span>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-num" id="statSigns">0</div><div class="stat-lbl">Signs Detected</div></div>
+            <div class="stat-card"><div class="stat-num" id="statAvg">—</div><div class="stat-lbl">Avg. Confidence</div></div>
+            <div class="stat-card"><div class="stat-num" id="statStreak">0🔥</div><div class="stat-lbl">Streak</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ TAB: LEARN SIGNS ══ -->
+    <section class="tab-panel" id="tab-learn">
+      <div class="learn-hero">
+        <h2>Learn ISL Signs</h2>
+        <p>Tap any card to see the handshape description</p>
+        <input class="search-box" id="searchBox" type="search" placeholder="Search signs… e.g. namaste" />
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="alphabet">A–Z Alphabet</button>
+        <button class="filter-btn" data-filter="number">Numbers</button>
+        <button class="filter-btn" data-filter="greeting">Greetings</button>
+        <button class="filter-btn" data-filter="common">Common Words</button>
+      </div>
+      <div class="sign-grid" id="signGrid"></div>
+    </section>
+
+    <!-- ══ TAB: ABOUT ISL ══ -->
+    <section class="tab-panel" id="tab-about">
+      <div class="about-wrap">
+        <div class="about-hero">
+          <div class="about-flag">🇮🇳</div>
+          <h2>Indian Sign Language</h2>
+          <p>The visual mother tongue of India's Deaf community</p>
+        </div>
+        <div class="about-grid">
+          <div class="about-card"><span class="about-icon">👐</span><h3>What is ISL?</h3><p>Indian Sign Language is a complete natural language with its own grammar and vocabulary — distinct from ASL, BSL, or any spoken Indian language.</p></div>
+          <div class="about-card"><span class="about-icon">📊</span><h3>18M+ Users</h3><p>Over 18 million deaf and hard-of-hearing people in India use ISL as their primary language, with regional dialects across states.</p></div>
+          <div class="about-card"><span class="about-icon">🏛️</span><h3>Official Body</h3><p>ISL is standardised through ISLRTC — Indian Sign Language Research & Training Centre, under the Ministry of Social Justice.</p></div>
+          <div class="about-card"><span class="about-icon">🤖</span><h3>How This Works</h3><p>MediaPipe Hands finds 21 landmarks on your hand. A classifier maps those coordinates to ISL signs — everything runs locally, nothing is uploaded.</p></div>
+        </div>
+        <div class="tech-section">
+          <h3>Built With</h3>
+          <div class="tech-chips">
+            <span>MediaPipe Hands</span><span>TensorFlow.js</span>
+            <span>Python / Flask</span><span>scikit-learn</span>
+            <span>Web Speech API</span><span>Canvas API</span>
+          </div>
+        </div>
+        <div class="resources-section">
+          <h3>Datasets Used</h3>
+          <a class="resource-link" href="https://www.kaggle.com/datasets/eraakash/indian-sign-language-hand-landmarks-dataset" target="_blank" rel="noopener">📦 ISL Hand Landmarks Dataset (MediaPipe, 2024) ↗</a>
+          <a class="resource-link" href="https://www.kaggle.com/datasets/prathumarikeri/indian-sign-language-isl" target="_blank" rel="noopener">📦 Indian Sign Language ISL — Character Level ↗</a>
+          <a class="resource-link" href="https://www.kaggle.com/datasets/ananyaarya22/isl-data" target="_blank" rel="noopener">📦 ISL Dataset — 36 Classes (0–9, A–Z) ↗</a>
+          <a class="resource-link" href="https://www.kaggle.com/datasets/rushilverma07/indian-sign-language-alphabet-dataset" target="_blank" rel="noopener">📦 ISL Alphabet Dataset (2025) ↗</a>
+        </div>
+        <div class="resources-section">
+          <h3>Learn More</h3>
+          <a class="resource-link" href="https://islrtc.nic.in" target="_blank" rel="noopener">🏛️ ISLRTC — Official ISL Research Centre ↗</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- MediaPipe CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+
+  <script src="src/isl-data.js"></script>
+  <script src="src/recognizer.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/app.js"></script>
+
+  <!-- Auth guard: redirect to login if not signed in -->
+  <script>
+    (function() {
+      const token = localStorage.getItem('isl_token') || sessionStorage.getItem('isl_token');
+      if (!token) { window.location.href = 'login.html'; return; }
+
+      // Show user name in header status chip
+      try {
+        const user = JSON.parse(localStorage.getItem('isl_user') || sessionStorage.getItem('isl_user') || '{}');
+        if (user.first_name) {
+          const chip = document.getElementById('statusChip');
+          if (chip) {
+            chip.innerHTML = `
+              <span class="status-dot offline"></span>
+              <span class="status-text">Hi, ${user.first_name}</span>
+              <button onclick="islLogout()" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:11px;margin-left:4px;" title="Sign out">✕</button>
+            `;
+          }
+        }
+      } catch(e) {}
+    })();
+
+    function islLogout() {
+      localStorage.removeItem('isl_token'); localStorage.removeItem('isl_user');
+      sessionStorage.removeItem('isl_token'); sessionStorage.removeItem('isl_user');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>

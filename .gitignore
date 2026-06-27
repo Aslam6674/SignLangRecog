@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+*.pkl
+*.db
+ml/data/
+ml/reports/
+backend/model/
+backend/data/
+.env

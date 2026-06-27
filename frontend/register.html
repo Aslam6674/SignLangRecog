@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISL Decode — Create Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+  <div class="auth-shell">
+
+    <!-- Left panel -->
+    <div class="auth-left">
+      <div class="brand">
+        <div class="brand-icon">🤟</div>
+        <h1 class="brand-name">ISL Decode</h1>
+        <p class="brand-tagline">Indian Sign Language · AI Recognition</p>
+      </div>
+      <div class="brand-features">
+        <div class="feature"><span class="feat-icon">◉</span> Free forever — no credit card</div>
+        <div class="feature"><span class="feat-icon">◎</span> Runs 100% in your browser</div>
+        <div class="feature"><span class="feat-icon">◌</span> Save your recognition history</div>
+        <div class="feature"><span class="feat-icon">◈</span> Track your learning progress</div>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="auth-right">
+      <div class="auth-card">
+
+        <div class="auth-header">
+          <h2 class="auth-title">Create your account</h2>
+          <p class="auth-sub">Start recognising ISL signs in seconds</p>
+        </div>
+
+        <div class="auth-alert" id="authAlert" hidden></div>
+
+        <form class="auth-form" id="registerForm" novalidate>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label" for="firstName">First name</label>
+              <div class="field-wrap">
+                <span class="field-icon">👤</span>
+                <input class="field-input" type="text" id="firstName" name="firstName"
+                  placeholder="Priya" autocomplete="given-name" required />
+              </div>
+              <span class="field-error" id="firstNameErr"></span>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="lastName">Last name</label>
+              <div class="field-wrap">
+                <span class="field-icon">👤</span>
+                <input class="field-input" type="text" id="lastName" name="lastName"
+                  placeholder="Sharma" autocomplete="family-name" required />
+              </div>
+              <span class="field-error" id="lastNameErr"></span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="regEmail">Email address</label>
+            <div class="field-wrap">
+              <span class="field-icon">✉</span>
+              <input class="field-input" type="email" id="regEmail" name="email"
+                placeholder="you@example.com" autocomplete="email" required />
+            </div>
+            <span class="field-error" id="emailErr"></span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="regPassword">Password</label>
+            <div class="field-wrap">
+              <span class="field-icon">🔒</span>
+              <input class="field-input" type="password" id="regPassword" name="password"
+                placeholder="Min 8 characters" autocomplete="new-password" required />
+              <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">👁</button>
+            </div>
+            <span class="field-error" id="pwErr"></span>
+            <!-- Password strength bar -->
+            <div class="pw-strength" id="pwStrength" hidden>
+              <div class="pw-bar">
+                <div class="pw-fill" id="pwFill"></div>
+              </div>
+              <span class="pw-label" id="pwLabel">Weak</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="confirmPassword">Confirm password</label>
+            <div class="field-wrap">
+              <span class="field-icon">🔒</span>
+              <input class="field-input" type="password" id="confirmPassword" name="confirmPassword"
+                placeholder="Repeat your password" autocomplete="new-password" required />
+            </div>
+            <span class="field-error" id="confirmErr"></span>
+          </div>
+
+          <div class="terms-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="acceptTerms" name="terms" required />
+              <span class="checkbox-custom"></span>
+              I agree to the
+              <a href="#" class="auth-link">Terms of Service</a>
+              and
+              <a href="#" class="auth-link">Privacy Policy</a>
+            </label>
+            <span class="field-error" id="termsErr"></span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnSubmit">
+            <span id="btnText">Create Account</span>
+            <span class="btn-spinner" id="btnSpinner" hidden></span>
+          </button>
+
+        </form>
+
+        <div class="auth-divider"><span>or sign up with</span></div>
+
+        <div class="social-row">
+          <button class="social-btn" id="btnGoogle" type="button">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Google
+          </button>
+          <button class="social-btn" id="btnGithub" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+            GitHub
+          </button>
+        </div>
+
+        <p class="auth-switch">
+          Already have an account?
+          <a href="login.html" class="auth-link">Sign in</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
